@@ -1,10 +1,10 @@
 import React from 'react'
-import '../../static/less/header.less';
+import '../less/header.less';
 
 let Header = React.createClass({
   render() {
     return <div className="components-header row">
-        <img src="/static/images/logo.png" width="40" alt="" className="-col-auto" />
+        <img src="/app/images/logo.png" width="40" alt="" className="-col-auto" />
         <h1 className="caption">React Music player</h1>
       </div>;
   }
