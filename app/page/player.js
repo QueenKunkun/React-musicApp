@@ -28,21 +28,25 @@ let Player = React.createClass({
     return `${miniutes}:${seconds}`;
   },
   componentDidMount() {
+    this.mounted = true; //flag
     $('#player').bind($.jPlayer.event.timeupdate, e => {
       duration = e.jPlayer.status.duration;
-      this.setState({
-        volume: e.jPlayer.options.volume * 100,
-        progress: Math.round(e.jPlayer.status.currentPercentAbsolute),
-        leftTime: this.formatTime(duration *
-          (1 - e.jPlayer.status.currentPercentAbsolute / 100))
-      });
+      if (this.mounted) {
+        this.setState({
+          volume: e.jPlayer.options.volume * 100,
+          progress: Math.round(e.jPlayer.status.currentPercentAbsolute),
+          leftTime: this.formatTime(duration *
+            (1 - e.jPlayer.status.currentPercentAbsolute / 100))
+        });
+      }
     });
   },
   componentWillUnMount() {
+    this.mounted = false; //重置flag
     $('#player').unbind($.jPlayer.event.timeupdate);
   },
   progressChangeHandler(progress) {
-    console.log('progressChangeHandler', progress);
+    // console.log('progressChangeHandler', progress);
     $('#player').jPlayer('play', duration * progress);
   },
   changeVolumeHandler(progress) {
@@ -54,9 +58,11 @@ let Player = React.createClass({
     } else {
       $('#player').jPlayer('play');
     }
-    this.setState({
-      isPlay: !this.state.isPlay
-    });
+    if (this.mounted) {
+      this.setState({
+        isPlay: !this.state.isPlay
+      });
+    }
   },
   render() {
     return (

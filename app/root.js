@@ -17,9 +17,11 @@ let App = React.createClass({
     $('#player').jPlayer('setMedia', {
       mp3: musicItem.file
     }).jPlayer('play');
-    this.setState({
-      currentMusicItem: musicItem
-    })
+    if (this.mounted) {
+      this.setState({
+        currentMusicItem: musicItem
+      })
+    }
   },
   playNext(type="next") {
     let index = this.findMusicIndex(this.state.currentMusicItem);
@@ -36,6 +38,7 @@ let App = React.createClass({
     return this.state.musicList.indexOf(musicItem);
   },
   componentDidMount() {
+    this.mounted = true;
     $('#player').jPlayer({
       // ready: function() {
       //   $(this)
@@ -53,11 +56,13 @@ let App = React.createClass({
       this.playNext();
     });
     Pubsub.subscribe('DELETE_MUSIC', (msg, musicItem) => {
-      this.setState({
-        musicList: this.state.musicList.filter(item => {
-          return item !== musicItem;
+      if (this.mounted) {
+        this.setState({
+          musicList: this.state.musicList.filter(item => {
+            return item !== musicItem;
+          })
         })
-      })
+      }
     });
     Pubsub.subscribe('PLAY_MUSIC', (msg, musicItem) => {
       this.playMusic(musicItem);
@@ -70,6 +75,7 @@ let App = React.createClass({
     });
   },
   componentWillUnMount() {
+    this.mounted = false;
     Pubsub.unsubscribe('PLAY_MUSIC');
     Pubsub.unsubscribe('DELETE_MUSIC');
     Pubsub.unsubscribe('PLAY_PREV');
